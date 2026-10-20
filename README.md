@@ -1,95 +1,57 @@
 # Network Triage Tool
 
-A Flask-based cybersecurity project for analyzing authorized network packet capture (PCAP) files and identifying traffic patterns that may need further investigation.
+A Python-based cybersecurity project for analyzing network packet capture files (PCAP/PCAPNG) and identifying potentially suspicious network activity.
 
 ## Features
 
-- PCAP and PCAPNG file analysis
-- IPv4 and IPv6 traffic inspection
-- Protocol distribution dashboard
-- Source and destination IP investigation
-- Heuristic detection of possible TCP SYN port scans
-- Security findings with severity levels
-- SQLite database for analysis history
-- Search and filtering for security alerts
-- Alert status management
-- CSV and PDF report export
-- Dashboard charts
-- Automated tests with pytest
+- Upload and analyze PCAP/PCAPNG files
+- Summarize network traffic
+- Detect possible TCP SYN port-scan activity using heuristics
+- Store analysis history in SQLite
+- Review and filter alerts
+- Investigate IP addresses
+- Export analysis reports to CSV and PDF
+- View traffic summaries and charts
 
-## Technology Stack
+## Tech Stack
 
 - Python
 - Flask
 - Scapy
 - SQLite
-- HTML and CSS
-- JavaScript and Chart.js
+- HTML, CSS, JavaScript
+- Chart.js
 - ReportLab
 - Pytest
 
-## Project Structure
+## Run Locally
 
-```text
-network-triage-tool/
-├── analyzer/
-├── database/
-├── static/
-├── templates/
-├── tests/
-├── uploads/
-├── reports/
-├── app.py
-├── requirements.txt
-└── README.md
-```
-
-## Installation
-
-1. Clone the repository:
-
-   ```bash
-   git clone YOUR_GITHUB_REPOSITORY_URL
-   cd network-triage-tool
-   ```
-
-2. Create and activate a virtual environment on Windows:
-
-   ```powershell
-   python -m venv venv
-   .\venv\Scripts\Activate.ps1
-   ```
-
+1. Clone the repository.
+2. Create and activate a Python virtual environment.
 3. Install dependencies:
 
-   ```powershell
+   ```bash
    pip install -r requirements.txt
    ```
 
-4. Set a development secret key in PowerShell:
+4. Start the application:
 
-   ```powershell
-   $env:FLASK_SECRET_KEY = python -c "import secrets; print(secrets.token_hex(32))"
-   ```
-
-5. Start the application:
-
-   ```powershell
+   ```bash
    python app.py
    ```
 
-6. Open `http://127.0.0.1:5000` in your browser.
+5. Open `http://127.0.0.1:5000` in your browser.
 
 ## Run Tests
 
-```powershell
-python -m pytest tests -v
+```bash
+python -m pytest -v
 ```
 
-## Security Notice
+## Disclaimer
 
-Use this tool only with packet captures you are authorized to analyze. Detection results are heuristic indicators, not proof of malicious activity. This project is a local development prototype and requires additional security review before production deployment.
+This project is intended for educational and defensive cybersecurity analysis. Detection results are heuristic and should be verified before drawing conclusions. Analyze only packet captures you are authorized to access.
 
 ## Author
 
-Rahul Singh — BCA Cyber Security student.
+Rahul Singh
