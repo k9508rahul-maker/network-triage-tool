@@ -1,0 +1,67 @@
+
+{% extends "base.html" %}
+
+{% block page_title %}Investigation History{% endblock %}
+
+{% block content %}
+
+<section class="panel">
+    <div class="panel-heading">
+        <h3>Previous Analyses</h3>
+        <a href="/analyzer" class="secondary-button">
+            New Analysis
+        </a>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Filename</th>
+                    <th>Date (UTC)</th>
+                    <th>Packets</th>
+                    <th>Unique IPs</th>
+                    <th>Findings</th>
+                    <th>Report</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record.id }}</td>
+                    <td>{{ record.filename }}</td>
+                    <td>{{ record.analyzed_at }}</td>
+                    <td>{{ record.total_packets }}</td>
+                    <td>{{ record.unique_ips }}</td>
+                    <td>{{ record.findings_count }}</td>
+                    <td>
+                        <a href="{{ url_for(
+                            'export_csv',
+                            analysis_id=record.id
+                        ) }}"
+                        class="btn">
+                            Export CSV
+                        </a>
+
+                        <a href="{{ url_for(
+                            'export_pdf',
+                            analysis_id=record.id
+                        ) }}"
+                        class="btn">
+                            Download PDF
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7">No analyses saved yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}

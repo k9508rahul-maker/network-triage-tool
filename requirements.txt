@@ -1,0 +1,6 @@
+Flask
+scapy
+pandas
+reportlab
+Flask-WTF
+pytest

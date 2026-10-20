@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NetGuard | Network Triage</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">
+            <span class="brand-icon">◈</span>
+            <div>
+                <h2>NetGuard</h2>
+                <p>NETWORK SECURITY</p>
+            </div>
+        </div>
+
+        <div class="menu-label">MAIN MENU</div>
+
+        <nav>
+            <a href="/" class="nav-link">▦ Dashboard</a>
+            <a href="/analyzer" class="nav-link">⌕ Traffic Analyzer</a>
+            <a href="/alerts" class="nav-link">⚠ Security Alerts</a>
+            <a href="/history" class="nav-link">◷ Investigation History</a>
+            <a href="{{ url_for('ip_investigation') }}" class="nav-link">
+                  IP Investigation
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span class="status-dot"></span>
+            Local Analysis Mode
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">SECURITY OPERATIONS CENTER</p>
+                <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+            </div>
+
+            <div class="topbar-right">
+                <span class="system-status">
+                    <span class="status-dot"></span>
+                    System Ready
+                </span>
+
+                <button
+                    id="themeToggle"
+                    class="theme-button"
+                    type="button"
+                >
+                    ☼ Theme
+                </button>
+            </div>
+        </header>
+
+        {% block content %}{% endblock %}
+
+    </main>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Existing Dashboard JavaScript -->
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+</body>
+</html>

@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block page_title %}Traffic Analyzer{% endblock %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="notice">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<section class="panel upload-panel">
+    <h3>PCAP Traffic Analysis</h3>
+    <p class="panel-note">
+        Upload an authorized network capture for offline analysis.
+        Maximum file size: 10 MB.
+    </p>
+
+    <form method="POST"
+          enctype="multipart/form-data"
+          class="upload-form">
+
+        <!-- Step 17.3: CSRF protection token -->
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+        <label for="pcap_file">Select PCAP file</label>
+
+        <input
+            id="pcap_file"
+            type="file"
+            name="pcap_file"
+            accept=".pcap,.pcapng"
+            required
+        >
+
+        <button class="primary-button" type="submit">
+            Analyze Traffic
+        </button>
+    </form>
+</section>
+
+{% if result %}
+
+<section class="stats-grid analysis-stats">
+
+    <article class="stat-card">
+        <p>Total Packets</p>
+        <h2>{{ result.total_packets }}</h2>
+    </article>
+
+    <article class="stat-card">
+        <p>Unique IP Addresses</p>
+        <h2>{{ result.unique_ips }}</h2>
+    </article>
+
+    <article class="stat-card">
+        <p>Detected Events</p>
+        <h2>{{ result.events|length }}</h2>
+    </article>
+
+    <article class="stat-card">
+        <p>Packet Records Shown</p>
+        <h2>{{ result.packets_shown }}</h2>
+    </article>
+
+</section>
+
+<section class="panel">
+    <h3>Protocol Statistics</h3>
+
+    <div class="protocol-list">
+        {% for protocol, count in result.protocols.items() %}
+        <div class="status-row">
+            <span>{{ protocol }}</span>
+            <strong>{{ count }}</strong>
+        </div>
+        {% else %}
+        <p class="panel-note">No packets found.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="panel">
+    <h3>Suspicious Activity Findings</h3>
+
+    {% if result.events %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Source IP</th>
+                    <th>Finding</th>
+                    <th>Unique Ports</th>
+                    <th>Severity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in result.events %}
+                <tr>
+                    <td>{{ event.source }}</td>
+                    <td>{{ event.finding }}</td>
+                    <td>{{ event.count }}</td>
+                    <td>
+                        <span class="severity-medium">
+                            {{ event.severity }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="panel-note">
+        No events matched the current detection rule.
+        This does not guarantee that the traffic is safe.
+    </p>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <h3>Packet Details</h3>
+    <p class="panel-note">
+        File: {{ result.filename }}.
+        Showing at most 200 packet records.
+    </p>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Source IP</th>
+                    <th>Destination IP</th>
+                    <th>Protocol</th>
+                    <th>Source Port</th>
+                    <th>Destination Port</th>
+                    <th>Size (bytes)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for packet in result.packets %}
+                <tr>
+                    <td>{{ packet.source }}</td>
+                    <td>{{ packet.destination }}</td>
+                    <td>{{ packet.protocol }}</td>
+                    <td>{{ packet.source_port }}</td>
+                    <td>{{ packet.destination_port }}</td>
+                    <td>{{ packet.size }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6">No packet records available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endif %}
+
+{% endblock %}

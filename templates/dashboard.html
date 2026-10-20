@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+Security Overview
+{% endblock %}
+
+{% block content %}
+
+<section class="welcome-card">
+    <div>
+        <span class="badge">NETWORK TRIAGE SYSTEM</span>
+
+        <h2>Network Intelligence Dashboard</h2>
+
+        <p>
+            Analyze traffic, investigate suspicious connections
+            and review potential security incidents.
+        </p>
+    </div>
+
+    <a href="/analyzer" class="primary-button">
+        + Analyze Traffic
+    </a>
+</section>
+
+<!-- Dashboard Statistics -->
+<section class="stats-grid">
+
+    <article class="stat-card">
+        <p>Total Packets</p>
+        <h2>{{ stats.total_packets }}</h2>
+        <span>Packets analyzed</span>
+    </article>
+
+    <article class="stat-card">
+        <p>Unique IP Addresses</p>
+        <h2>{{ stats.unique_ips }}</h2>
+        <span>Distinct network endpoints</span>
+    </article>
+
+    <article class="stat-card">
+        <p>Suspicious Events</p>
+        <h2>{{ stats.suspicious_events }}</h2>
+        <span>Potential indicators</span>
+    </article>
+
+    <article class="stat-card">
+        <p>High Severity</p>
+        <h2>{{ stats.high_severity }}</h2>
+        <span>Events requiring review</span>
+    </article>
+
+</section>
+
+<!-- Protocol Graph and Investigation Summary -->
+<section class="content-grid">
+
+    <article class="panel">
+        <div class="panel-heading">
+            <h3>Protocol Distribution</h3>
+            <span class="panel-tag">TRAFFIC ANALYTICS</span>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="protocolChart"></canvas>
+        </div>
+
+        {% if not protocol_totals %}
+        <p class="panel-note">
+            Analyze a PCAP file to populate this chart.
+        </p>
+        {% endif %}
+    </article>
+
+    <article class="panel">
+        <div class="panel-heading">
+            <h3>Investigation Summary</h3>
+        </div>
+
+        <div class="status-row">
+            <span>Total Analyses</span>
+            <strong>{{ stats.total_analyses }}</strong>
+        </div>
+
+        <div class="status-row">
+            <span>Total Findings</span>
+            <strong>{{ stats.suspicious_events }}</strong>
+        </div>
+
+        <div class="status-row">
+            <span>High Severity Findings</span>
+            <strong>{{ stats.high_severity }}</strong>
+        </div>
+
+        <p class="panel-note">
+            Statistics are based on saved investigations.
+        </p>
+    </article>
+
+</section>
+
+<!-- Step 16.4: Traffic Trend and Severity Charts -->
+<section class="dashboard-grid">
+
+    <article class="panel">
+        <div class="panel-heading">
+            <h3>Packet Trend</h3>
+            <span class="panel-tag">LAST 7 ANALYSES</span>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="trafficTrendChart"></canvas>
+        </div>
+
+        {% if not traffic_chart_data %}
+        <p class="panel-note">
+            Analyze a PCAP file to populate the packet trend chart.
+        </p>
+        {% endif %}
+    </article>
+
+    <article class="panel">
+        <div class="panel-heading">
+            <h3>Finding Severity</h3>
+            <span class="panel-tag">SECURITY OVERVIEW</span>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="severityChart"></canvas>
+        </div>
+
+        {% if not severity_summary or
+              (severity_summary.High == 0 and
+               severity_summary.Medium == 0 and
+               severity_summary.Low == 0) %}
+        <p class="panel-note">
+            No severity findings available yet.
+        </p>
+        {% endif %}
+    </article>
+
+</section>
+
+<!-- Recent Investigations -->
+<section class="panel">
+    <div class="panel-heading">
+        <h3>Recent Investigations</h3>
+
+        <a href="/history" class="secondary-button">
+            View All
+        </a>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Capture File</th>
+                    <th>Packets</th>
+                    <th>Unique IPs</th>
+                    <th>Findings</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in recent_analyses %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.filename }}</td>
+                    <td>{{ item.total_packets }}</td>
+                    <td>{{ item.unique_ips }}</td>
+                    <td>{{ item.findings_count }}</td>
+                    <td>
+                        <a href="{{ url_for(
+                            'analysis_detail',
+                            analysis_id=item.id
+                        ) }}">View Details</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6">
+                        No investigations available yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Protocol Data for Existing Chart.js -->
+<script id="protocol-data" type="application/json">
+{{ protocol_totals | tojson }}
+</script>
+
+<!-- Step 16.4: Traffic Chart Data -->
+<script id="traffic-chart-data" type="application/json">
+{{ traffic_chart_data | tojson }}
+</script>
+
+<!-- Step 16.4: Severity Chart Data -->
+<script id="severity-chart-data" type="application/json">
+{{ severity_summary | tojson }}
+</script>
+
+{% endblock %}

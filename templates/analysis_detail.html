@@ -1,0 +1,102 @@
+
+{% extends "base.html" %}
+
+{% block page_title %}Investigation Details{% endblock %}
+
+{% block content %}
+
+<section class="welcome-card">
+    <div>
+        <span class="badge">INVESTIGATION #{{ analysis.id }}</span>
+        <h2>{{ analysis.filename }}</h2>
+        <p>
+            Analysis timestamp (UTC): {{ analysis.analyzed_at }}
+        </p>
+    </div>
+
+    <a class="primary-button"
+       href="{{ url_for('export_csv', analysis_id=analysis.id) }}">
+        Export CSV
+    </a>
+</section>
+
+<section class="stats-grid">
+    <article class="stat-card">
+        <p>Total Packets</p>
+        <h2>{{ analysis.total_packets }}</h2>
+    </article>
+
+    <article class="stat-card">
+        <p>Unique IP Addresses</p>
+        <h2>{{ analysis.unique_ips }}</h2>
+    </article>
+
+    <article class="stat-card">
+        <p>Protocols</p>
+        <h2>{{ protocols|length }}</h2>
+    </article>
+
+    <article class="stat-card">
+        <p>Findings</p>
+        <h2>{{ events|length }}</h2>
+    </article>
+</section>
+
+<section class="panel">
+    <h3>Protocol Statistics</h3>
+
+    {% for protocol, count in protocols.items() %}
+    <div class="status-row">
+        <span>{{ protocol }}</span>
+        <strong>{{ count }} packets</strong>
+    </div>
+    {% else %}
+    <p class="panel-note">No protocol data available.</p>
+    {% endfor %}
+</section>
+
+<section class="panel">
+    <h3>Detection Findings</h3>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Source IP</th>
+                    <th>Finding</th>
+                    <th>Severity</th>
+                    <th>Count</th>
+                    <th>Evidence</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td>{{ event.source_ip }}</td>
+                    <td>{{ event.finding }}</td>
+                    <td>{{ event.severity }}</td>
+                    <td>{{ event.event_count }}</td>
+                    <td>{{ event.evidence }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5">
+                        No detection findings for this investigation.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <p class="panel-note">
+        Findings are rule-based indicators and need analyst verification.
+    </p>
+</section>
+
+<a href="/history" class="secondary-button">
+    Back to History
+</a>
+
+{% endblock %}

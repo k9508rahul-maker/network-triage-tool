@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block page_title %}Security Alerts{% endblock %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+    {% for message in messages %}
+        <div class="notice">{{ message }}</div>
+    {% endfor %}
+{% endwith %}
+
+<section class="panel">
+    <div class="panel-heading">
+        <h3>Alert Investigation Center</h3>
+        <span class="panel-tag">THREAT TRIAGE</span>
+    </div>
+
+    <!-- GET form: CSRF token is not required -->
+    <form method="GET" action="{{ url_for('alerts') }}"
+          class="filter-form">
+
+        <input
+            type="search"
+            name="search"
+            placeholder="Search IP, finding or filename..."
+            value="{{ search }}"
+        >
+
+        <select name="severity">
+            <option value="">All Severities</option>
+            {% for item in ["High", "Medium", "Low"] %}
+            <option value="{{ item }}"
+                {% if severity == item %}selected{% endif %}>
+                {{ item }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <select name="status">
+            <option value="">All Statuses</option>
+            {% for item in ["Open", "Investigating", "Resolved"] %}
+            <option value="{{ item }}"
+                {% if status == item %}selected{% endif %}>
+                {{ item }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" class="primary-button">
+            Apply Filters
+        </button>
+
+        <a href="{{ url_for('alerts') }}"
+           class="secondary-button">
+            Reset
+        </a>
+    </form>
+</section>
+
+<section class="panel">
+    <div class="panel-heading">
+        <h3>Detection Findings</h3>
+        <span class="panel-tag">
+            {{ events|length }} RESULTS
+        </span>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Source IP</th>
+                    <th>Finding</th>
+                    <th>Severity</th>
+                    <th>Evidence</th>
+                    <th>Capture</th>
+                    <th>Status</th>
+                    <th>Update</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td>{{ event.source_ip }}</td>
+                    <td>{{ event.finding }}</td>
+                    <td>
+                        <span class="severity-tag severity-{{ event.severity|lower }}">
+                            {{ event.severity }}
+                        </span>
+                    </td>
+                    <td>{{ event.evidence }}</td>
+                    <td>{{ event.filename }}</td>
+                    <td>{{ event.status }}</td>
+                    <td>
+                        <form method="POST"
+                              action="{{ url_for('alerts') }}"
+                              class="status-form">
+
+                            <!-- Step 17.3: CSRF protection token -->
+                            <input
+                                type="hidden"
+                                name="csrf_token"
+                                value="{{ csrf_token() }}"
+                            >
+
+                            <input type="hidden"
+                                   name="finding_id"
+                                   value="{{ event.id }}">
+
+                            <select name="status" aria-label="New alert status">
+                                {% for item in ["Open", "Investigating", "Resolved"] %}
+                                <option value="{{ item }}"
+                                    {% if event.status == item %}selected{% endif %}>
+                                    {{ item }}
+                                </option>
+                                {% endfor %}
+                            </select>
+
+                            <button type="submit"
+                                    class="secondary-button">
+                                Save
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7">
+                        No matching findings. Try different filters
+                        or analyze a PCAP file first.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <p class="panel-note">
+        Up to 200 findings are displayed. A detection is an
+        investigation lead, not proof of malicious activity.
+    </p>
+</section>
+
+{% endblock %}
